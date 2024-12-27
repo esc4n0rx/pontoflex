@@ -85,6 +85,12 @@ const RegistroPontoModal = ({ onClose, onSubmit }) => {
           <button type="submit" className="bg-green-500 hover:bg-green-600 px-4 py-2 rounded">
             Registrar
           </button>
+          <button
+          onClick={onClose}
+          className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded text-white mt-4"
+        >
+          Fechar
+        </button>
         </form>
       </div>
     </div>

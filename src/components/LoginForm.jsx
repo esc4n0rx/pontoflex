@@ -20,8 +20,9 @@ const LoginForm = ({ onLogin }) => {
         return;
       }
 
-      onLogin(data[0]); // Passa o usuário logado para o estado principal
-      toast.success(`Bem-vindo, ${data[0].nome_completo}!`);
+      const usuarioLogado = data[0];
+      onLogin(usuarioLogado); // Salva no contexto e no localStorage
+      toast.success(`Bem-vindo, ${usuarioLogado.nome_completo}!`);
     } catch (err) {
       console.error(err);
       toast.error('Erro inesperado ao logar.');

@@ -61,18 +61,18 @@ const Home = () => {
       <Navbar onLoginClick={openLoginModal} onRegisterClick={openRegisterModal} />
       <main className="flex flex-col items-center justify-center min-h-screen px-4">
         <GradientTitle />
-        <p className="mt-4 text-gray-400 text-center">
+        <p className="mt-4 text-gray-400 text-center text-sm sm:text-base md:text-lg">
           Bem-vindo ao <span className="text-blue-400 font-bold">PontoFlex</span>! Gerencie seus horários com facilidade.
         </p>
-        <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-4xl">
+        <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-6 w-full max-w-4xl">
           {features.map((feature, index) => (
             <div
               key={index}
               className="bg-gray-800 rounded-lg p-6 shadow-md transition transform hover:scale-105"
             >
               <div className="text-3xl mb-4">{feature.icon}</div>
-              <h3 className="text-xl font-bold text-blue-400 mb-2">{feature.title}</h3>
-              <p className="text-gray-300">{feature.description}</p>
+              <h3 className="text-lg sm:text-xl font-bold text-blue-400 mb-2">{feature.title}</h3>
+              <p className="text-gray-300 text-sm sm:text-base">{feature.description}</p>
             </div>
           ))}
         </div>

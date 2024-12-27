@@ -22,13 +22,15 @@ const RegisterForm = ({ onRegister }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const { data, error } = await supabase.from('users').insert([formData]);
+      const { data, error } = await supabase.from('users').insert([formData]).select();
       if (error) {
         toast.error(`Erro ao registrar: ${error.message}`);
         return;
       }
-      onRegister(formData); // Atualiza o estado com o usuário registrado
-      toast.success('Registro realizado com sucesso!');
+
+      const usuarioRegistrado = data[0]; // Supabase retorna o usuário recém-criado
+      onRegister(usuarioRegistrado); // Salva no contexto e localStorage
+      toast.success(`Registro realizado com sucesso! Bem-vindo, ${usuarioRegistrado.nome_completo}!`);
     } catch (err) {
       console.error(err);
       toast.error('Erro inesperado ao registrar.');

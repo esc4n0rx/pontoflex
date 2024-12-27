@@ -12,14 +12,37 @@ export const getPeriodoFolha = () => {
 };
 
 /**
+ * Gera uma lista de folhas disponíveis com base no período atual.
+ * Por padrão, gera folhas dos últimos 12 meses.
+ * @param {number} meses - Número de meses a retroceder para gerar as folhas (padrão: 12).
+ */
+export const gerarFolhasDisponiveis = (meses = 12) => {
+  const folhas = [];
+  const hoje = new Date();
+
+  for (let i = 0; i < meses; i++) {
+    const ano = hoje.getFullYear();
+    const mes = hoje.getMonth() - i;
+
+    const inicio = new Date(ano, mes - (hoje.getDate() < 16 ? 1 : 0), 16);
+    const fim = new Date(inicio.getFullYear(), inicio.getMonth() + 1, 15);
+
+    const nome = `Folha de ${inicio.toLocaleString('pt-BR', { month: 'long' }).charAt(0).toUpperCase() + inicio.toLocaleString('pt-BR', { month: 'long' }).slice(1)} (${inicio.toLocaleDateString()} - ${fim.toLocaleDateString()})`;
+
+    folhas.push({ inicio, fim, nome });
+  }
+
+  return folhas.reverse(); 
+};
+
+/**
  * Calcula os indicadores baseados nos registros do usuário.
- * @param {string} userId - ID do usuário logado.
- * @param {object} periodo - Objeto com `inicio` e `fim` da folha.
+ * @param {string} userId 
+ * @param {object} periodo 
  */
 export const calcularIndicadores = async (userId, periodo) => {
   const { inicio, fim } = periodo;
 
-  // Busca os registros do usuário no período da folha
   const { data: registros, error } = await supabase
     .from('registro_pontos')
     .select('total_horas, horas_extras, horas_negativas, horas_positivas, adicional_noturno, is_feriado')
@@ -32,7 +55,7 @@ export const calcularIndicadores = async (userId, periodo) => {
     throw new Error('Erro ao buscar registros');
   }
 
-  // Inicializa os acumuladores
+
   let totalBancoHoras = 0;
   let totalHorasExtras = 0;
   let totalHorasNegativas = 0;
@@ -40,7 +63,7 @@ export const calcularIndicadores = async (userId, periodo) => {
   let totalAdicionalNoturno = 0;
   let totalReceber = 0;
 
-  // Busca o salário base do usuário
+
   const { data: user, error: userError } = await supabase
     .from('users')
     .select('salario_base, carga_horaria_mensal')

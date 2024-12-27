@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
 import RegistroPontoModal from '../components/RegistroPontoModal';
 import { supabase } from '../supabaseClient';
-import { getPeriodoFolha, calcularIndicadores } from '../folhaUtils';
+import { getPeriodoFolha, calcularIndicadores, gerarFolhasDisponiveis } from '../folhaUtils';
 import { toast } from 'react-toastify';
 import { useUser } from '../UserContext';
 import GerenciarRegistrosModal from '../components/GerenciarRegistrosModal';
@@ -11,6 +11,8 @@ import { calcularTotalHoras, calcularHorasExtras, calcularAdicionalNoturno, isHo
 
 const Dashboard = () => {
   const { user } = useUser();
+  const [isTrocarFolhaModalOpen, setIsTrocarFolhaModalOpen] = useState(false);
+  const [folhas, setFolhas] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isGerenciarModalOpen, setIsGerenciarModalOpen] = useState(false);
   const [isAlterarModalOpen, setIsAlterarModalOpen] = useState(false);
@@ -45,6 +47,22 @@ const Dashboard = () => {
     setIsAlterarModalOpen(false);
   };
 
+
+  const openTrocarFolhaModal = () => {
+    const folhasDisponiveis = gerarFolhasDisponiveis(); // Gera as folhas disponíveis
+    setFolhas(folhasDisponiveis);
+    setIsTrocarFolhaModalOpen(true);
+  };
+  
+  const closeTrocarFolhaModal = () => setIsTrocarFolhaModalOpen(false);
+  
+  const handleTrocarFolha = (novaFolha) => {
+    setPeriodo(novaFolha); // Atualiza o período da folha
+    closeTrocarFolhaModal(); // Fecha o modal
+  };
+
+  
+
   const fetchRegistros = async () => {
     try {
       const { data, error } = await supabase
@@ -64,6 +82,12 @@ const Dashboard = () => {
   };
 
   const atualizarIndicadores = async () => {
+    if (!user || !user.id) {
+      console.warn('Usuário não definido ao tentar atualizar indicadores.');
+      return;
+    }
+    
+
     try {
       const dadosIndicadores = await calcularIndicadores(user.id, periodo);
       setIndicadores({
@@ -80,8 +104,11 @@ const Dashboard = () => {
   };
 
   useEffect(() => {
-    atualizarIndicadores();
-  }, [periodo]);
+    if (user && user.id) {
+      atualizarIndicadores();
+    }
+  }, [periodo, user]);
+  
 
   const handleRegistroPonto = async (registro) => {
     try {
@@ -153,7 +180,7 @@ const Dashboard = () => {
     { label: 'Registrar Pontos', action: openModal },
     { label: 'Gerenciar Registros', action: openGerenciarModal },
     { label: 'Alterar Registro', action: () => toast.info('Selecione um registro na aba Gerenciar.') },
-    { label: 'Trocar Período da Folha', action: () => setPeriodo(getPeriodoFolha()) },
+    { label: 'Trocar Período da Folha', action: openTrocarFolhaModal },
   ];
 
   return (
@@ -207,6 +234,33 @@ const Dashboard = () => {
           onSubmit={handleAlterarRegistro}
         />
       )}
+
+      {isTrocarFolhaModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+          <div className="bg-gray-800 text-white p-6 rounded-lg shadow-lg w-full max-w-md">
+            <h2 className="text-lg font-bold mb-4">Trocar Período da Folha</h2>
+            <ul className="space-y-4">
+              {folhas.map((folha, index) => (
+                <li key={index}>
+                  <button
+                    onClick={() => handleTrocarFolha(folha)}
+                    className="w-full bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded text-white text-left"
+                  >
+                    {folha.nome}
+                  </button>
+                </li>
+              ))}
+            </ul>
+            <button
+              onClick={closeTrocarFolhaModal}
+              className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded text-white mt-4"
+            >
+              Fechar
+            </button>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 };
