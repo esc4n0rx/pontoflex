@@ -75,38 +75,41 @@ export const calcularTotalHoras = (horaEntrada, horaSaida) => {
  * @returns {object} - Contém horas positivas, extras e negativas no formato HH:mm:ss
  */
 export const calcularHorasExtras = (totalHoras, escala, diaSemana, isFeriado) => {
-    const resultado = { horasPositivas: 0, horasExtras: 0, horasNegativas: 0 };
-  
-    let horasNecessarias = 0;
-  
-    if (escala === '6x1') horasNecessarias = diaSemana === 'domingo' ? 0 : 8;
-    else if (escala === '5x2') horasNecessarias = diaSemana === 'sábado' ? 0 : 8.75;
-  
-    const saldoHoras = totalHoras - horasNecessarias;
-  
-    if (isFeriado || diaSemana === 'domingo') {
-      resultado.horasExtras = totalHoras;
-    } else if (diaSemana === 'sábado' && escala === '5x2') {
-      resultado.horasPositivas = Math.min(totalHoras, 2);
-      resultado.horasExtras = Math.max(0, totalHoras - 2);
+  const resultado = { horasPositivas: 0, horasExtras: 0, horasNegativas: 0 };
+
+  let horasNecessarias = 0;
+
+  if (escala === '6x1') {
+    horasNecessarias = diaSemana === 'domingo' ? 0 : 7.33; // 7 horas e 20 minutos 
+  } else if (escala === '5x2') {
+    horasNecessarias = diaSemana === 'sábado' || diaSemana === 'domingo' ? 0 : 8.75; // 8 horas e 45 minutos
+  }
+
+  const saldoHoras = totalHoras - horasNecessarias;
+
+  if (isFeriado || diaSemana === 'domingo') {
+    resultado.horasExtras = totalHoras;
+  } else if (diaSemana === 'sábado' && escala === '5x2') {
+    resultado.horasPositivas = Math.min(totalHoras, 2);
+    resultado.horasExtras = Math.max(0, totalHoras - 2);
+  } else {
+    if (saldoHoras > 2) {
+      resultado.horasPositivas = 2;
+      resultado.horasExtras = saldoHoras - 2;
+    } else if (saldoHoras > 0) {
+      resultado.horasPositivas = saldoHoras;
     } else {
-      if (saldoHoras > 2) {
-        resultado.horasPositivas = 2;
-        resultado.horasExtras = saldoHoras - 2;
-      } else if (saldoHoras > 0) {
-        resultado.horasPositivas = saldoHoras;
-      } else {
-        resultado.horasNegativas = Math.abs(saldoHoras);
-      }
+      resultado.horasNegativas = Math.abs(saldoHoras);
     }
-  
-    // Formata os resultados antes de retorná-los
-    return {
-      horasPositivas: formatarHoras(resultado.horasPositivas),
-      horasExtras: formatarHoras(resultado.horasExtras),
-      horasNegativas: formatarHoras(resultado.horasNegativas),
-    };
+  }
+
+  return {
+    horasPositivas: formatarHoras(resultado.horasPositivas),
+    horasExtras: formatarHoras(resultado.horasExtras),
+    horasNegativas: formatarHoras(resultado.horasNegativas),
   };
+};
+
   
   
 
