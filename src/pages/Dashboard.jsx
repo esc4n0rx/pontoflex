@@ -86,7 +86,7 @@ const Dashboard = () => {
       console.warn('Usuário não definido ao tentar atualizar indicadores.');
       return;
     }
-    
+
 
     try {
       const dadosIndicadores = await calcularIndicadores(user.id, periodo);
@@ -236,10 +236,10 @@ const Dashboard = () => {
       )}
 
       {isTrocarFolhaModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div className="bg-gray-800 text-white p-6 rounded-lg shadow-lg w-full max-w-md">
-            <h2 className="text-lg font-bold mb-4">Trocar Período da Folha</h2>
-            <ul className="space-y-4">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center px-4 sm:px-6">
+          <div className="bg-gray-800 text-white p-4 sm:p-6 rounded-lg shadow-lg w-full max-w-lg sm:max-w-md">
+            <h2 className="text-lg sm:text-xl font-bold mb-4 text-center">Trocar Período da Folha</h2>
+            <ul className="space-y-4 max-h-60 sm:max-h-80 overflow-y-auto">
               {folhas.map((folha, index) => (
                 <li key={index}>
                   <button
@@ -253,14 +253,13 @@ const Dashboard = () => {
             </ul>
             <button
               onClick={closeTrocarFolhaModal}
-              className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded text-white mt-4"
+              className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded text-white mt-4 w-full"
             >
               Fechar
             </button>
           </div>
         </div>
       )}
-
     </div>
   );
 };

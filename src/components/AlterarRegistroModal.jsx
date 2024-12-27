@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 
 const AlterarRegistroModal = ({ registro, onClose, onSubmit }) => {
+  const [dia, setDia] = useState(registro.dia);
   const [horaEntrada, setHoraEntrada] = useState(registro.hora_entrada);
   const [horaSaida, setHoraSaida] = useState(registro.hora_saida);
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (!horaEntrada || !horaSaida) {
+    if (!dia || !horaEntrada || !horaSaida) {
       alert('Preencha todos os campos!');
       return;
     }
@@ -18,16 +19,25 @@ const AlterarRegistroModal = ({ registro, onClose, onSubmit }) => {
     }
 
     onSubmit({
+      dia,
       hora_entrada: horaEntrada,
       hora_saida: horaSaida,
     });
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center px-4 sm:px-6">
       <div className="bg-gray-800 text-white p-6 rounded-lg shadow-lg w-full max-w-md">
         <h2 className="text-lg font-bold mb-4">Alterar Registro</h2>
         <form onSubmit={handleSubmit} className="flex flex-col">
+          <label className="mb-2">Data:</label>
+          <input
+            type="date"
+            value={dia}
+            onChange={(e) => setDia(e.target.value)}
+            className="border p-2 rounded mb-4 text-black"
+            required
+          />
           <label className="mb-2">Hora de Entrada:</label>
           <input
             type="time"
