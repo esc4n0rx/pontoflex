@@ -1,0 +1,90 @@
+{
+    "feriados": [
+      {
+        "dia": 1,
+        "mes": "Janeiro",
+        "feriado": "Ano Novo"
+      },
+      {
+        "dia": 3,
+        "mes": "Março",
+        "feriado": "Segunda de Carnaval"
+      },
+      {
+        "dia": 4,
+        "mes": "Março",
+        "feriado": "Terça de Carnaval"
+      },
+      {
+        "dia": 5,
+        "mes": "Março",
+        "feriado": "Quarta-feira de Cinzas (ponto facultativo até as 14h)"
+      },
+      {
+        "dia": 18,
+        "mes": "Abril",
+        "feriado": "Sexta-feira Santa"
+      },
+      {
+        "dia": 21,
+        "mes": "Abril",
+        "feriado": "Tiradentes"
+      },
+      {
+        "dia": 1,
+        "mes": "Maio",
+        "feriado": "Dia do Trabalhador"
+      },
+      {
+        "dia": 19,
+        "mes": "Junho",
+        "feriado": "Corpus Christi"
+      },
+      {
+        "dia": 7,
+        "mes": "Setembro",
+        "feriado": "Independência do Brasil"
+      },
+      {
+        "dia": 12,
+        "mes": "Outubro",
+        "feriado": "Nossa Senhora Aparecida"
+      },
+      {
+        "dia": 28,
+        "mes": "Outubro",
+        "feriado": "Dia do Servidor Público"
+      },
+      {
+        "dia": 2,
+        "mes": "Novembro",
+        "feriado": "Finados"
+      },
+      {
+        "dia": 15,
+        "mes": "Novembro",
+        "feriado": "Proclamação da República"
+      },
+      {
+        "dia": 20,
+        "mes": "Novembro",
+        "feriado": "Dia da Consciência Negra"
+      },
+      {
+        "dia": 24,
+        "mes": "Dezembro",
+        "feriado": "Véspera de Natal (ponto facultativo após as 14h)"
+      },
+      {
+        "dia": 25,
+        "mes": "Dezembro",
+        "feriado": "Natal"
+      },
+      {
+        "dia": 31,
+        "mes": "Dezembro",
+        "feriado": "Véspera de Ano Novo (ponto facultativo após as 14h)"
+      }
+    ]
+  }
+  

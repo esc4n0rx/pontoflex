@@ -1,34 +1,43 @@
-import axios from 'axios';
 
-/**
- * Verifica se uma data é feriado.
- * @param {Date} date - Data a ser verificada.
- * @param {string} countryCode - Código do país (padrão "BR").
- * @returns {Promise<boolean>} - Retorna `true` se for feriado.
- */
-export const isHoliday = async (date, countryCode = 'BR') => {
-    const API_KEY = process.env.REACT_APP_HOLIDAY_API_KEY;
-  
-    if (!API_KEY) {
-      throw new Error('A chave da API para feriados não está configurada nas variáveis de ambiente.');
-    }
-  
-    const url = `https://holidays.abstractapi.com/v1/?api_key=${API_KEY}&country=${countryCode}&year=${date.getFullYear()}&month=${date.getMonth() + 1}&day=${date.getDate()}`;
-  
-    try {
-      const response = await axios.get(url, { timeout: 5000 });
-      if (response.status === 200) {
-        const holidays = response.data;
-        return holidays.length > 0;
-      } else {
-        console.error(`Erro na requisição: ${response.status}`);
-        return false;
-      }
-    } catch (error) {
-      console.error('Erro ao verificar feriado:', error);
-      return false;
-    }
-  };
+import feriados2025 from '../src/holiday.json';
+
+// Mapeia meses por escrito para número
+const monthsMap = {
+  'Janeiro': 1,
+  'Fevereiro': 2,
+  'Março': 3,
+  'Abril': 4,
+  'Maio': 5,
+  'Junho': 6,
+  'Julho': 7,
+  'Agosto': 8,
+  'Setembro': 9,
+  'Outubro': 10,
+  'Novembro': 11,
+  'Dezembro': 12
+};
+
+export const isHoliday = async (date) => {
+  // Se não for o ano de 2025, já devolve false.
+  // (Ou adapte para anos diferentes, se quiser.)
+  if (date.getFullYear() !== 2025) {
+    return false;
+  }
+
+  // Extrai dia e mês da data
+  const dia = date.getDate();
+  const mes = date.getMonth() + 1;
+
+  // Verifica se bate com algum feriado no JSON
+  const encontrado = feriados2025.feriados.some((fer) => {
+    const mesNumerico = monthsMap[fer.mes]; 
+    return fer.dia === dia && mesNumerico === mes;
+  });
+
+  return encontrado; // true se encontrou, false se não
+};
+
+
 
   
 /**
@@ -64,6 +73,22 @@ export const calcularTotalHoras = (horaEntrada, horaSaida) => {
     return horasTrabalhadas + minutosTrabalhados / 60;
   };
   
+  /**
+ * Corrige a data para ser salva corretamente no banco
+ * @param {Date|string} data - Data a ser corrigida
+ * @returns {string} - Data formatada em UTC (YYYY-MM-DD)
+ */
+ 
+ // Ajustado para criar uma data "no meio do dia" e não cair pro dia anterior:
+export const corrigirDataRegistro = (data) => {
+  // data vem no formato 'YYYY-MM-DD'
+  const [year, month, day] = data.split('-').map(Number);
+  // Cria a data no meio do dia local (12:00) pra não correr o risco de cair no dia anterior
+  const dataMeioDia = new Date(year, month - 1, day, 12);
+  return dataMeioDia.toISOString().split('T')[0]; // Assim fica 2024-12-28
+};
+
+  
   
 
 /**
@@ -74,15 +99,17 @@ export const calcularTotalHoras = (horaEntrada, horaSaida) => {
  * @param {boolean} isFeriado - Indica se o dia é feriado
  * @returns {object} - Contém horas positivas, extras e negativas no formato HH:mm:ss
  */
+
+
 export const calcularHorasExtras = (totalHoras, escala, diaSemana, isFeriado) => {
   const resultado = { horasPositivas: 0, horasExtras: 0, horasNegativas: 0 };
 
   let horasNecessarias = 0;
 
   if (escala === '6x1') {
-    horasNecessarias = diaSemana === 'domingo' ? 0 : 7.33; // 7 horas e 20 minutos 
+    horasNecessarias = diaSemana === 'domingo' ? 0 : 7.33; // 7 horas e 20 minutos
   } else if (escala === '5x2') {
-    horasNecessarias = diaSemana === 'sábado' || diaSemana === 'domingo' ? 0 : 8.75; // 8 horas e 45 minutos
+    horasNecessarias = diaSemana === 'sábado' ? 2 : diaSemana === 'domingo' ? 0 : 8.75; // 2 horas aos sábados
   }
 
   const saldoHoras = totalHoras - horasNecessarias;
@@ -110,8 +137,8 @@ export const calcularHorasExtras = (totalHoras, escala, diaSemana, isFeriado) =>
   };
 };
 
-  
-  
+
+
 
 /**
  * Formata horas decimais para o formato HH:mm:ss

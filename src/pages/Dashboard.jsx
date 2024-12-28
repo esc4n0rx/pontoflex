@@ -7,7 +7,7 @@ import { toast } from 'react-toastify';
 import { useUser } from '../UserContext';
 import GerenciarRegistrosModal from '../components/GerenciarRegistrosModal';
 import AlterarRegistroModal from '../components/AlterarRegistroModal';
-import { calcularTotalHoras, calcularHorasExtras, calcularAdicionalNoturno, isHoliday } from '../registroPontoUtils';
+import { calcularTotalHoras, calcularHorasExtras, calcularAdicionalNoturno, isHoliday ,corrigirDataRegistro} from '../registroPontoUtils';
 
 const Dashboard = () => {
   const { user } = useUser();
@@ -61,7 +61,6 @@ const Dashboard = () => {
     closeTrocarFolhaModal(); // Fecha o modal
   };
 
-  
 
   const fetchRegistros = async () => {
     try {
@@ -71,15 +70,32 @@ const Dashboard = () => {
         .eq('usuario_id', user.id)
         .gte('dia', periodo.inicio.toISOString())
         .lte('dia', periodo.fim.toISOString());
-
+  
       if (error) throw error;
-
-      setRegistros(data);
+  
+        const registrosCorrigidos = data.map((registro) => {
+        console.log('Registro original:', registro);
+        const [year, month, day] = registro.dia.split('-');
+        // Monta "28/12/2024"
+        const diaFormatado = `${day}/${month}/${year}`;
+        console.log('Dia formatado:', diaFormatado);
+  
+        return {
+          ...registro,
+          dia: diaFormatado,
+        };
+      });
+  
+      setRegistros(registrosCorrigidos);
+      console.log('Registros buscados:', registrosCorrigidos);
     } catch (err) {
       console.error('Erro ao buscar registros:', err);
       toast.error('Erro ao buscar registros.');
     }
   };
+  
+  
+  
 
   const atualizarIndicadores = async () => {
     if (!user || !user.id) {
@@ -116,11 +132,12 @@ const Dashboard = () => {
       const feriado = await isHoliday(new Date(registro.dia));
       const escala = user.escala;
       const id = user.id;
-      const diaSemana = new Date(registro.dia).toLocaleString('pt-BR', { weekday: 'long' }).toLowerCase();
-
+      const [year, month, day] = registro.dia.split('-').map(Number);
+      const dateLocal = new Date(year, month - 1, day); 
+      const diaSemana = dateLocal.toLocaleString('pt-BR', { weekday: 'long' }).toLowerCase();
       const { horasExtras, horasPositivas, horasNegativas } = calcularHorasExtras(totalHoras, escala, diaSemana, feriado);
       const adicionalNoturno = calcularAdicionalNoturno(registro.horaEntrada, registro.horaSaida, registro.flagNoturno);
-
+  
       const dadosRegistro = {
         usuario_id: id,
         dia: registro.dia,
@@ -134,10 +151,11 @@ const Dashboard = () => {
         is_feriado: feriado,
         escala_usuario: escala,
       };
-
+      console.log('Dados do registro:', dadosRegistro);
+  
       const { data, error } = await supabase.from('registro_pontos').insert([dadosRegistro]);
       if (error) throw error;
-
+  
       toast.success('Ponto registrado com sucesso!');
       atualizarIndicadores();
     } catch (err) {
@@ -147,6 +165,7 @@ const Dashboard = () => {
       closeModal();
     }
   };
+  
 
   const handleAlterarRegistro = async (alteracoes) => {
     try {
@@ -169,15 +188,15 @@ const Dashboard = () => {
   };
 
   const cards = [
-    { title: 'Total de Banco de Horas', value: indicadores.totalBancoHoras },
+    { title: 'Total de Horas Trabalhadas', value: indicadores.totalBancoHoras },
     { title: 'Horas Extras', value: indicadores.totalHorasExtras },
-    { title: 'Horas Negativas', value: indicadores.totalHorasNegativas },
-    { title: 'Horas Positivas', value: indicadores.totalHorasPositivas },
+    { title: 'Total de Horas Negativas', value: indicadores.totalHorasNegativas },
+    { title: 'Total de Horas Positivas', value: indicadores.totalHorasPositivas },
     { title: 'Total a Receber', value: indicadores.totalReceber },
   ];
 
   const options = [
-    { label: 'Registrar Pontos', action: openModal },
+    { label: 'Registrar Ponto', action: openModal },
     { label: 'Gerenciar Registros', action: openGerenciarModal },
     { label: 'Alterar Registro', action: () => toast.info('Selecione um registro na aba Gerenciar.') },
     { label: 'Trocar Período da Folha', action: openTrocarFolhaModal },
