@@ -21,7 +21,7 @@ const LoginForm = ({ onLogin }) => {
       }
 
       const usuarioLogado = data[0];
-      onLogin(usuarioLogado); // Salva no contexto e no localStorage
+      onLogin(usuarioLogado); 
       toast.success(`Bem-vindo, ${usuarioLogado.nome_completo}!`);
     } catch (err) {
       console.error(err);

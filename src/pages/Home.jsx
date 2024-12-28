@@ -78,14 +78,12 @@ const Home = () => {
         </div>
       </main>
 
-      {/* Login Modal */}
       {isLoginOpen && (
         <Modal onClose={closeLoginModal}>
           <LoginForm onLogin={handleLogin} />
         </Modal>
       )}
 
-      {/* Register Modal */}
       {isRegisterOpen && (
         <Modal onClose={closeRegisterModal}>
           <RegisterForm onRegister={handleRegister} />

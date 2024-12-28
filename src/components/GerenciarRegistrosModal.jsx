@@ -4,9 +4,7 @@ const GerenciarRegistrosModal = ({ registros, onClose, onAlterarRegistro }) => {
   const [filtroInicio, setFiltroInicio] = useState('');
   const [filtroFim, setFiltroFim] = useState('');
 
-  // Filtra somente pela data
-  const registrosFiltrados = registros.filter((registro) => {
-    // Aqui vamos criar objeto Date só para comparar com filtroInicio/filtroFim
+    const registrosFiltrados = registros.filter((registro) => {
     const dataJs = new Date(registro.dia); 
     const inicio = filtroInicio ? new Date(filtroInicio) : null;
     const fim = filtroFim ? new Date(filtroFim) : null;
@@ -53,7 +51,7 @@ const GerenciarRegistrosModal = ({ registros, onClose, onAlterarRegistro }) => {
             {registrosFiltrados.map((registro) => {
               return (
                 <tr key={registro.id} className="bg-gray-800 hover:bg-gray-700">
-                  <td>{registro.dia}</td> {/* Já está em DD/MM/YYYY */}
+                  <td>{registro.dia}</td>
                   <td className="px-4 py-2">{registro.hora_entrada}</td>
                   <td className="px-4 py-2">{registro.hora_saida}</td>
                   <td className="px-4 py-2">

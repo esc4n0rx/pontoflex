@@ -8,7 +8,7 @@ const Navbar = ({ onLoginClick, onRegisterClick }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const handleLogout = () => {
-    setUser(null); // Remove do estado e do localStorage
+    setUser(null); 
     navigate('/');
   };
 
@@ -35,6 +35,12 @@ const Navbar = ({ onLoginClick, onRegisterClick }) => {
         {user ? (
           <div className="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-4">
             <span className="text-gray-300">Bem-vindo, {user.nome_completo}!</span>
+            <button
+              onClick={() => navigate('/dashboard')}
+              className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded transition w-full sm:w-auto"
+            >
+              Dashboard
+            </button>
             <button
               onClick={handleLogout}
               className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded transition w-full sm:w-auto"

@@ -28,8 +28,8 @@ const RegisterForm = ({ onRegister }) => {
         return;
       }
 
-      const usuarioRegistrado = data[0]; // Supabase retorna o usuário recém-criado
-      onRegister(usuarioRegistrado); // Salva no contexto e localStorage
+      const usuarioRegistrado = data[0]; 
+      onRegister(usuarioRegistrado); 
       toast.success(`Registro realizado com sucesso! Bem-vindo, ${usuarioRegistrado.nome_completo}!`);
     } catch (err) {
       console.error(err);

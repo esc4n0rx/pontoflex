@@ -49,7 +49,7 @@ const Dashboard = () => {
 
 
   const openTrocarFolhaModal = () => {
-    const folhasDisponiveis = gerarFolhasDisponiveis(); // Gera as folhas disponíveis
+    const folhasDisponiveis = gerarFolhasDisponiveis(); 
     setFolhas(folhasDisponiveis);
     setIsTrocarFolhaModalOpen(true);
   };
@@ -57,8 +57,8 @@ const Dashboard = () => {
   const closeTrocarFolhaModal = () => setIsTrocarFolhaModalOpen(false);
   
   const handleTrocarFolha = (novaFolha) => {
-    setPeriodo(novaFolha); // Atualiza o período da folha
-    closeTrocarFolhaModal(); // Fecha o modal
+    setPeriodo(novaFolha); 
+    closeTrocarFolhaModal(); 
   };
 
 
@@ -76,7 +76,6 @@ const Dashboard = () => {
         const registrosCorrigidos = data.map((registro) => {
         console.log('Registro original:', registro);
         const [year, month, day] = registro.dia.split('-');
-        // Monta "28/12/2024"
         const diaFormatado = `${day}/${month}/${year}`;
         console.log('Dia formatado:', diaFormatado);
   
@@ -94,15 +93,11 @@ const Dashboard = () => {
     }
   };
   
-  
-  
-
   const atualizarIndicadores = async () => {
     if (!user || !user.id) {
       console.warn('Usuário não definido ao tentar atualizar indicadores.');
       return;
     }
-
 
     try {
       const dadosIndicadores = await calcularIndicadores(user.id, periodo);
