@@ -186,7 +186,7 @@ const Dashboard = () => {
     { title: 'Total de Horas Trabalhadas', value: indicadores.totalBancoHoras },
     { title: 'Horas Extras', value: indicadores.totalHorasExtras },
     { title: 'Total de Horas Negativas', value: indicadores.totalHorasNegativas },
-    { title: 'Total de Horas Positivas', value: indicadores.totalHorasPositivas },
+    { title: 'Total de Banco de Horas', value: indicadores.totalHorasPositivas },
     { title: 'Total a Receber', value: indicadores.totalReceber },
   ];
 

@@ -114,15 +114,20 @@ export const calcularHorasExtras = (totalHoras, escala, diaSemana, isFeriado) =>
 
   const saldoHoras = totalHoras - horasNecessarias;
 
+  let multiplicadorHoraExtra = 1.5; // 50% adicional para dias normais
+  if (isFeriado || diaSemana === 'domingo') {
+    multiplicadorHoraExtra = 2; // 100% adicional para feriados e domingos
+  }
+
   if (isFeriado || diaSemana === 'domingo') {
     resultado.horasExtras = totalHoras;
   } else if (diaSemana === 'sábado' && escala === '5x2') {
     resultado.horasPositivas = Math.min(totalHoras, 2);
-    resultado.horasExtras = Math.max(0, totalHoras - 2);
+    resultado.horasExtras = Math.max(0, totalHoras - 2) * multiplicadorHoraExtra;
   } else {
     if (saldoHoras > 2) {
       resultado.horasPositivas = 2;
-      resultado.horasExtras = saldoHoras - 2;
+      resultado.horasExtras = (saldoHoras - 2) * multiplicadorHoraExtra;
     } else if (saldoHoras > 0) {
       resultado.horasPositivas = saldoHoras;
     } else {
@@ -136,7 +141,6 @@ export const calcularHorasExtras = (totalHoras, escala, diaSemana, isFeriado) =>
     horasNegativas: formatarHoras(resultado.horasNegativas),
   };
 };
-
 
 
 
