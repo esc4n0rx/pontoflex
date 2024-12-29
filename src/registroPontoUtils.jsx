@@ -106,45 +106,40 @@ export const calcularHorasExtras = (totalHoras, escala, diaSemana, isFeriado) =>
 
   let horasNecessarias = 0;
 
+  // Define as horas necessárias com base na escala e no dia da semana
   if (escala === '6x1') {
-    horasNecessarias = diaSemana === 'domingo' ? 0 : 7.33; // 7 horas e 20 minutos
+    horasNecessarias = diaSemana === 'domingo' ? 0 : 7.33; // 7 horas e 20 minutos de segunda a sábado
   } else if (escala === '5x2') {
     horasNecessarias = diaSemana === 'sábado' ? 2 : diaSemana === 'domingo' ? 0 : 8.75; // 2 horas aos sábados
   }
 
   const saldoHoras = totalHoras - horasNecessarias;
 
+  // Multiplicador de hora extra
+  let multiplicadorHoraExtra = 1.5; // 50% adicional para dias normais
   if (isFeriado || diaSemana === 'domingo') {
-    resultado.horasExtras = totalHoras; // Todas as horas são extras (100%)
-  } else if (diaSemana === 'sábado' && escala === '5x2') {
-    // Para sábados na escala 5x2
-    resultado.horasPositivas = Math.min(totalHoras, 2); // As primeiras 2 horas vão para o banco positivo
-    resultado.horasExtras = Math.max(0, totalHoras - 2); // O restante são horas extras
+    multiplicadorHoraExtra = 2; // 100% adicional para feriados e domingos
+  }
+
+  if (isFeriado || diaSemana === 'domingo') {
+    resultado.horasExtras = totalHoras; // Todas as horas trabalhadas são extras
   } else {
-    // Para dias normais (não sábado, domingo ou feriado)
-    if (saldoHoras > 0) {
-      if (saldoHoras > 2) {
-        resultado.horasPositivas = 2; // Até 2 horas no banco positivo
-        resultado.horasExtras = saldoHoras - 2; // O restante são horas extras
-      } else {
-        resultado.horasPositivas = saldoHoras; // Todas as horas positivas se forem <= 2
-      }
+    if (saldoHoras > 2) {
+      resultado.horasPositivas = 2; // Até 2 horas vão para o banco de horas positivas
+      resultado.horasExtras = (saldoHoras - 2) * multiplicadorHoraExtra; // O restante vai para hora extra
+    } else if (saldoHoras > 0) {
+      resultado.horasPositivas = saldoHoras; // Se o saldo é menor que 2, vai para o banco de horas positivas
     } else {
-      resultado.horasNegativas = Math.abs(saldoHoras); // Caso tenha trabalhado menos que o necessário
+      resultado.horasNegativas = Math.abs(saldoHoras); // Saldo negativo
     }
   }
 
-  // Retorna os valores no formato correto
   return {
     horasPositivas: formatarHoras(resultado.horasPositivas),
     horasExtras: formatarHoras(resultado.horasExtras),
     horasNegativas: formatarHoras(resultado.horasNegativas),
   };
 };
-
-
-
-
 
 /**
  * Formata horas decimais para o formato HH:mm:ss
