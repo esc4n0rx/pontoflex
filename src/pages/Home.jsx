@@ -1,13 +1,29 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { ArrowRight, Clock, BarChart3, Calendar, Users } from 'lucide-react';
 import Navbar from '../components/Navbar';
-import GradientTitle from '../components/GradientTitle';
 import Modal from '../components/Modal';
 import LoginForm from '../components/LoginForm';
 import RegisterForm from '../components/RegisterForm';
 import { useUser } from '../UserContext';
 
-const Home = () => {
+
+function FeatureCard({ title, description, icon: Icon }) {
+  return (
+    <div className="bg-white/5 backdrop-blur-lg rounded-xl p-6 hover:bg-white/10 transition-all duration-300 border border-white/10">
+      <div className="h-12 w-12 rounded-lg bg-blue-500/10 flex items-center justify-center mb-4">
+        <Icon className="h-6 w-6 text-blue-400" />
+      </div>
+      <h3 className="text-xl font-semibold text-white mb-2">{title}</h3>
+      <p className="text-gray-400 leading-relaxed">{description}</p>
+    </div>
+  );
+}
+
+export default function Home() {
+  // ---------------------------
+  // LÓGICA DE LOGIN / REGISTRO
+  // ---------------------------
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
   const { setUser } = useUser();
@@ -21,63 +37,103 @@ const Home = () => {
 
   const handleLogin = (loggedInUser) => {
     setUser(loggedInUser);
-    console.log(loggedInUser);
     closeLoginModal();
     navigate('/dashboard');
   };
 
   const handleRegister = (registeredUser) => {
     setUser(registeredUser);
-    console.log(registeredUser);
     closeRegisterModal();
     navigate('/dashboard');
   };
 
+  // --------------
+  // CONTEÚDO NOVO
+  // --------------
   const features = [
     {
-      title: 'Registro de Ponto',
-      description: 'Registre suas horas de trabalho de forma simples e eficiente.',
-      icon: '🕒',
+      icon: Clock,
+      title: "Registro de Ponto",
+      description: "Registre suas horas de trabalho de forma simples e eficiente."
     },
     {
-      title: 'Gerenciamento de Registros',
-      description: 'Visualize, edite e organize todos os seus registros em um só lugar.',
-      icon: '📋',
+      icon: BarChart3,
+      title: "Indicadores Dinâmicos",
+      description: "Acompanhe suas horas extras, banco de horas e total a receber em tempo real."
     },
     {
-      title: 'Indicadores Dinâmicos',
-      description: 'Acompanhe suas horas extras, banco de horas e total a receber em tempo real.',
-      icon: '📊',
+      icon: Calendar,
+      title: "Gerenciamento de Registros",
+      description: "Visualize, edite e organize todos os seus registros em um só lugar."
     },
     {
-      title: 'Escalas Flexíveis',
-      description: 'Suporte para escalas 6x1, 5x2 e personalizadas.',
-      icon: '🔄',
-    },
+      icon: Users,
+      title: "Escalas Flexíveis",
+      description: "Suporte para escalas 6x1, 5x2 e personalizadas."
+    }
   ];
 
   return (
-    <div className="bg-gray-900 text-white min-h-screen">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-blue-900">
       <Navbar onLoginClick={openLoginModal} onRegisterClick={openRegisterModal} />
-      <main className="flex flex-col items-center justify-center min-h-screen px-4">
-        <GradientTitle />
-        <p className="mt-4 text-gray-400 text-center text-sm sm:text-base md:text-lg">
-          Bem-vindo ao <span className="text-blue-400 font-bold">PontoFlex</span>! Gerencie seus horários com facilidade.
-        </p>
-        <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-6 w-full max-w-4xl">
-          {features.map((feature, index) => (
-            <div
-              key={index}
-              className="bg-gray-800 rounded-lg p-6 shadow-md transition transform hover:scale-105"
+
+      <div className="relative overflow-hidden">
+        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=2850&q=80')] bg-cover bg-center opacity-10" />
+        
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-24 sm:pb-32">
+          <div className="text-center">
+            <h1 className="text-4xl sm:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500 mb-6 animate-fade-in">
+              Transforme Seu Gerenciamento  de Horas
+            </h1>
+            <p className="text-gray-400 text-lg sm:text-xl max-w-2xl mx-auto mb-8">
+              Facilite seu trabalho de forma simples e eficiente com nossa plataforma de gerenciamento de horas.
+            </p>
+            <button
+              onClick={openLoginModal}
+              className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-3 rounded-lg font-medium inline-flex items-center gap-2 transition-all duration-300 transform hover:scale-105"
             >
-              <div className="text-3xl mb-4">{feature.icon}</div>
-              <h3 className="text-lg sm:text-xl font-bold text-blue-400 mb-2">{feature.title}</h3>
-              <p className="text-gray-300 text-sm sm:text-base">{feature.description}</p>
-            </div>
+              Começar Agora
+              <ArrowRight className="h-5 w-5" />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+        <div className="text-center mb-16">
+          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
+            Principais Funcionalidades
+          </h2>
+          <p className="text-gray-400 max-w-2xl mx-auto">
+            Tudo que você precisa para gerenciar seu trabalho de forma simples e eficaz.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          {features.map((feature, index) => (
+            <FeatureCard key={index} {...feature} />
           ))}
         </div>
-      </main>
+      </div>
 
+      <div className="bg-gradient-to-r from-blue-600 to-purple-600 py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-3xl font-bold text-white mb-4">
+            Pronto para Começar?
+          </h2>
+          <p className="text-blue-100 mb-8 max-w-2xl mx-auto">
+            Junte-se a milhares de profissionais que já usam nossa plataforma para melhorar o gerenciamento de suas horas.
+          </p>
+          <button
+            onClick={openRegisterModal}
+            className="bg-white text-blue-600 px-8 py-3 rounded-lg font-medium hover:bg-blue-50 transition-colors duration-300"
+          >
+            Iniciar Teste Gratuito
+          </button>
+        </div>
+      </div>
+
+      {/* Modais de Login e Registro */}
       {isLoginOpen && (
         <Modal onClose={closeLoginModal}>
           <LoginForm onLogin={handleLogin} />
@@ -91,6 +147,4 @@ const Home = () => {
       )}
     </div>
   );
-};
-
-export default Home;
+}

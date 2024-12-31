@@ -6,11 +6,17 @@ import { getPeriodoFolha, calcularIndicadores, gerarFolhasDisponiveis } from '..
 import { toast } from 'react-toastify';
 import { useUser } from '../UserContext';
 import GerenciarRegistrosModal from '../components/GerenciarRegistrosModal';
+import CalculoRescisaoModal from '../components/CalculoRescisaoModal';
 import AlterarRegistroModal from '../components/AlterarRegistroModal';
 import { calcularTotalHoras, calcularHorasExtras, calcularAdicionalNoturno, isHoliday ,corrigirDataRegistro} from '../registroPontoUtils';
 
 const Dashboard = () => {
   const { user } = useUser();
+  const [isCalculoRescisaoModalOpen, setIsCalculoRescisaoModalOpen] = useState(false);
+
+  const openCalculoRescisaoModal = () => setIsCalculoRescisaoModalOpen(true);
+  const closeCalculoRescisaoModal = () => setIsCalculoRescisaoModalOpen(false);
+
   const [isTrocarFolhaModalOpen, setIsTrocarFolhaModalOpen] = useState(false);
   const [folhas, setFolhas] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -193,7 +199,7 @@ const Dashboard = () => {
   const options = [
     { label: 'Registrar Ponto', action: openModal },
     { label: 'Gerenciar Registros', action: openGerenciarModal },
-    { label: 'Alterar Registro', action: () => toast.info('Selecione um registro na aba Gerenciar.') },
+    { label: 'Cálculo de Rescisão', action: openCalculoRescisaoModal },
     { label: 'Trocar Período da Folha', action: openTrocarFolhaModal },
   ];
 
@@ -248,6 +254,11 @@ const Dashboard = () => {
           onSubmit={handleAlterarRegistro}
         />
       )}
+
+      {isCalculoRescisaoModalOpen && (
+        <CalculoRescisaoModal onClose={closeCalculoRescisaoModal} />
+      )}
+
 
       {isTrocarFolhaModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center px-4 sm:px-6">
