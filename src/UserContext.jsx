@@ -1,13 +1,12 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
-// Criação do contexto
 const UserContext = createContext();
 
-// Provider para envolver a aplicação
+
 export const UserProvider = ({ children }) => {
   const [user, setUser] = useState(null);
 
-  // Recupera o usuário do localStorage ao carregar a aplicação
+
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
     console.log(storedUser);
@@ -16,7 +15,7 @@ export const UserProvider = ({ children }) => {
     }
   }, []);
 
-  // Atualiza o localStorage sempre que o usuário mudar
+
   const handleSetUser = (userData) => {
     if (userData) {
       localStorage.setItem('user', JSON.stringify(userData));
@@ -34,7 +33,6 @@ export const UserProvider = ({ children }) => {
   );
 };
 
-// Hook para acessar o contexto facilmente
 export const useUser = () => {
   return useContext(UserContext);
 };

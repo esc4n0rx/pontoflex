@@ -87,7 +87,7 @@ export const calcularIndicadores = async (userId, periodo) => {
 
     // Calcula o valor a receber para cada registro
     const valorHorasExtras = parseFloat(registro.horas_extras) * valorHora * (registro.is_feriado ? 2 : 1.5);
-    const valorAdicionalNoturno = parseFloat(registro.adicional_noturno) * valorHora * 0.5;
+    const valorAdicionalNoturno = parseFloat(registro.adicional_noturno) * valorHora * 0.2;
 
     totalReceber += valorHorasExtras + valorAdicionalNoturno;
   });

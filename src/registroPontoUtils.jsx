@@ -37,41 +37,43 @@ export const isHoliday = async (date) => {
   return encontrado; // true se encontrou, false se não
 };
 
-
-
-  
 /**
- * Calcula o total de horas trabalhadas
- * @param {string} horaEntrada - Hora de entrada no formato HH:mm
- * @param {string} horaSaida - Hora de saída no formato HH:mm
- * @returns {string} - Total de horas no formato HH:mm:ss
+ * Calcula o total de horas trabalhadas, inclusive quando cruza a meia-noite.
+ * @param {string} horaEntrada - Formato HH:mm
+ * @param {string} horaSaida   - Formato HH:mm
+ * @returns {number} - Total de horas (decimal). Ex.: 7.5 = 7h30min
  */
 export const calcularTotalHoras = (horaEntrada, horaSaida) => {
-    if (!horaEntrada || !horaSaida) {
-      console.error('Horas inválidas:', { horaEntrada, horaSaida });
-      console.log('Horas:', { horaEntrada, horaSaida });
-      return 0;
-    }
-  
-    const [horaE, minutoE] = horaEntrada.split(':').map(Number);
-    const [horaS, minutoS] = horaSaida.split(':').map(Number);
-  
-    if (isNaN(horaE) || isNaN(minutoE) || isNaN(horaS) || isNaN(minutoS)) {
-      console.error('Erro no parsing das horas:', { horaEntrada, horaSaida });
-      return 0;
-    }
-  
-    let horasTrabalhadas = horaS - horaE;
-    let minutosTrabalhados = minutoS - minutoE;
-  
-    if (minutosTrabalhados < 0) {
-      horasTrabalhadas -= 1;
-      minutosTrabalhados += 60;
-    }
-  
-    // Converte para horas decimais
-    return horasTrabalhadas + minutosTrabalhados / 60;
-  };
+  if (!horaEntrada || !horaSaida) {
+    console.error('Horas inválidas:', { horaEntrada, horaSaida });
+    return 0;
+  }
+
+  // 1. Converte para minutos
+  const [horaE, minutoE] = horaEntrada.split(':').map(Number);
+  const [horaS, minutoS] = horaSaida.split(':').map(Number);
+
+  // Se deu parsing errado, retorna 0
+  if (isNaN(horaE) || isNaN(minutoE) || isNaN(horaS) || isNaN(minutoS)) {
+    console.error('Erro no parsing das horas:', { horaEntrada, horaSaida });
+    return 0;
+  }
+
+  let entrada = horaE * 60 + minutoE;
+  let saida   = horaS * 60 + minutoS;
+
+  // 2. Se saída <= entrada, significa que passou da meia-noite
+  if (saida <= entrada) {
+    saida += 24 * 60;  // soma 24h em minutos
+  }
+
+  // 3. Duração total em minutos
+  const duracaoMinutos = saida - entrada;
+
+  // 4. Converte para horas decimais
+  return duracaoMinutos / 60; 
+};
+
   
   /**
  * Corrige a data para ser salva corretamente no banco
@@ -161,26 +163,40 @@ export const formatarHoras = (horasDecimais) => {
 
 
 
-/**
- * Calcula adicional noturno
- * @param {string} horaEntrada - Hora de entrada no formato HH:mm
- * @param {string} horaSaida - Hora de saída no formato HH:mm
- * @param {boolean} flagNoturno - Indica se o trabalho foi noturno
- * @returns {number} - Horas de adicional noturno
+  /**
+ * Calcula as horas em adicional noturno (22h às 05h).
+ * Se flagNoturno = true, entende que pode cruzar a meia-noite.
+ * Retorna somente a quantidade de horas em decimal que caem no intervalo noturno.
  */
 export const calcularAdicionalNoturno = (horaEntrada, horaSaida, flagNoturno) => {
-  if (!flagNoturno) return 0;
-
-  const [horaE, minutoE] = horaEntrada.split(':').map(Number);
-  const [horaS, minutoS] = horaSaida.split(':').map(Number);
-
-  let adicionalNoturno = 0;
-
-  for (let hora = horaE; hora !== horaS; hora = (hora + 1) % 24) {
-    if (hora >= 0 && hora < 5) {
-      adicionalNoturno += 1;
-    }
+  if (!flagNoturno) {
+    return 0;
   }
 
-  return adicionalNoturno + (minutoS - minutoE) / 60;
+  // 1. Converte hora de entrada e saída para minutos
+  const [hE, mE] = horaEntrada.split(':').map(Number);
+  const [hS, mS] = horaSaida.split(':').map(Number);
+
+  let entrada = hE * 60 + mE; 
+  let saida = hS * 60 + mS;
+
+  // 2. Se a saída é menor ou igual à entrada, soma 24h em minutos
+  if (saida <= entrada) {
+    saida += 24 * 60; 
+  }
+
+  // 3. Intervalo noturno: [22:00, 05:00 do dia seguinte]
+  const noturnoInicio = 22 * 60;  // 1320
+  const noturnoFim = 29 * 60;     // 1740 (05:00 do dia seguinte)
+
+  // 4. Calcula a sobreposição
+  const inicioOverlap = Math.max(entrada, noturnoInicio);
+  const fimOverlap = Math.min(saida, noturnoFim);
+  const duracaoOverlap = Math.max(0, fimOverlap - inicioOverlap);
+
+  // 5. Converte minutos para horas (decimal)
+  const horasNoturnas = duracaoOverlap / 60;
+
+  return horasNoturnas;
 };
+

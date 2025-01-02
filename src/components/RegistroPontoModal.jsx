@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { calcularTotalHoras, calcularHorasExtras, calcularAdicionalNoturno, isHoliday ,formatarHoras} from '../registroPontoUtils';
+import { calcularTotalHoras, calcularHorasExtras, calcularAdicionalNoturno, isHoliday } from '../registroPontoUtils';
 import { useUser } from '../UserContext';
 import { toast } from 'react-toastify';
+
 const RegistroPontoModal = ({ onClose, onSubmit }) => {
   const { user } = useUser();
   const [dia, setDia] = useState('');
@@ -11,38 +12,40 @@ const RegistroPontoModal = ({ onClose, onSubmit }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     if (!dia || !horaEntrada || !horaSaida) {
       alert('Todos os campos devem ser preenchidos.');
       return;
     }
-  
-    if (horaEntrada >= horaSaida) {
+
+    // Se não for noturno (flagNoturno === false) e a hora de entrada é >= hora de saída,
+    // significa que não cruzou a meia-noite e a entrada deve ser menor que a saída.
+    if (flagNoturno === false && horaEntrada >= horaSaida) {
       alert('A hora de entrada deve ser menor que a hora de saída.');
       return;
     }
-  
+
     const totalHoras = calcularTotalHoras(horaEntrada, horaSaida);
     const feriado = await isHoliday(new Date(dia));
     const escala = user.escala;
     const diaSemana = new Date(dia).toLocaleString('pt-BR', { weekday: 'long' }).toLowerCase();
-    const { horasExtras, horasPositivas, horasNegativas } = calcularHorasExtras(totalHoras, escala, diaSemana, feriado);
+    const { horasExtras, horasPositivas, horasNegativas } = 
+      calcularHorasExtras(totalHoras, escala, diaSemana, feriado);
+
     const adicionalNoturno = calcularAdicionalNoturno(horaEntrada, horaSaida, flagNoturno);
-  
+
     onSubmit({
       dia,
       horaEntrada,
       horaSaida,
-      total_horas: totalHoras, 
+      flagNoturno,
+      total_horas: totalHoras,
       horas_extras: horasExtras,
       horas_positivas: horasPositivas,
       horas_negativas: horasNegativas,
-      adicional_noturno: formatarHoras(adicionalNoturno),
+      adicional_noturno: adicionalNoturno,
     });
-  
-    onClose();
   };
-  
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
@@ -86,11 +89,11 @@ const RegistroPontoModal = ({ onClose, onSubmit }) => {
             Registrar
           </button>
           <button
-          onClick={onClose}
-          className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded text-white mt-4"
-        >
-          Fechar
-        </button>
+            onClick={onClose}
+            className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded text-white mt-4"
+          >
+            Fechar
+          </button>
         </form>
       </div>
     </div>
