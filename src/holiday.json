@@ -1,11 +1,6 @@
 {
     "feriados": [
       {
-        "dia": 1,
-        "mes": "Janeiro",
-        "feriado": "Ano Novo"
-      },
-      {
         "dia": 3,
         "mes": "Março",
         "feriado": "Segunda de Carnaval"
