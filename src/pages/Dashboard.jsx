@@ -8,6 +8,7 @@ import { useUser } from '../UserContext';
 import GerenciarRegistrosModal from '../components/GerenciarRegistrosModal';
 import CalculoRescisaoModal from '../components/CalculoRescisaoModal';
 import AlterarRegistroModal from '../components/AlterarRegistroModal';
+import RecalcularDadosModal from '../components/RecalcularRegistrosModal';
 import { calcularTotalHoras, calcularHorasExtras, calcularAdicionalNoturno, isHoliday ,corrigirDataRegistro} from '../registroPontoUtils';
 
 const Dashboard = () => {
@@ -16,6 +17,11 @@ const Dashboard = () => {
 
   const openCalculoRescisaoModal = () => setIsCalculoRescisaoModalOpen(true);
   const closeCalculoRescisaoModal = () => setIsCalculoRescisaoModalOpen(false);
+
+  const [isRecalcularModalOpen, setIsRecalcularModalOpen] = useState(false);
+
+  const openRecalcularModal = () => setIsRecalcularModalOpen(true);
+  const closeRecalcularModal = () => setIsRecalcularModalOpen(false);
 
   const [isTrocarFolhaModalOpen, setIsTrocarFolhaModalOpen] = useState(false);
   const [folhas, setFolhas] = useState([]);
@@ -132,15 +138,27 @@ const Dashboard = () => {
       const totalHoras = calcularTotalHoras(registro.horaEntrada, registro.horaSaida);
       const feriado = await isHoliday(new Date(registro.dia));
       const escala = user.escala;
-      const id = user.id;
       const [year, month, day] = registro.dia.split('-').map(Number);
-      const dateLocal = new Date(year, month - 1, day); 
-      const diaSemana = dateLocal.toLocaleString('pt-BR', { weekday: 'long' }).toLowerCase();
-      const { horasExtras, horasPositivas, horasNegativas } = calcularHorasExtras(totalHoras, escala, diaSemana, feriado);
-      const adicionalNoturno = calcularAdicionalNoturno(registro.horaEntrada, registro.horaSaida, registro.flagNoturno);
+      const date = new Date(Date.UTC(year, month - 1, day)); // Cria a data em UTC
+      const diaSemana = date.toLocaleString('pt-BR', { weekday: 'long', timeZone: 'UTC' }).toLowerCase();
+
   
+      // Log do dia da semana em texto
+      console.log(`Registrando ponto no dia: ${diaSemana.charAt(0).toUpperCase() + diaSemana.slice(1)}`);
+  
+      const { horasExtras, horasPositivas, horasNegativas } = calcularHorasExtras(
+        registro.horaEntrada,
+        registro.horaSaida,
+        escala,
+        diaSemana,
+        feriado
+      );
+      console.log('Horas extras:', horasExtras);
+  
+      const adicionalNoturno = calcularAdicionalNoturno(registro.horaEntrada, registro.horaSaida, registro.flagNoturno);
+      
       const dadosRegistro = {
-        usuario_id: id,
+        usuario_id: user.id,
         dia: registro.dia,
         hora_entrada: registro.horaEntrada,
         hora_saida: registro.horaSaida,
@@ -152,22 +170,22 @@ const Dashboard = () => {
         is_feriado: feriado,
         escala_usuario: escala,
       };
+  
       console.log('Dados do registro:', dadosRegistro);
   
       const { data, error } = await supabase.from('registro_pontos').insert([dadosRegistro]);
       if (error) throw error;
   
       toast.success('Ponto registrado com sucesso!');
+      closeModal();
       atualizarIndicadores();
     } catch (err) {
       console.error('Erro ao registrar ponto:', err);
       toast.error('Erro ao registrar ponto.');
-    } finally {
-      closeModal();
     }
   };
   
-
+  
   const handleAlterarRegistro = async (alteracoes) => {
     try {
       const { data, error } = await supabase
@@ -201,6 +219,7 @@ const Dashboard = () => {
     { label: 'Gerenciar Registros', action: openGerenciarModal },
     { label: 'Cálculo de Rescisão', action: openCalculoRescisaoModal },
     { label: 'Trocar Período da Folha', action: openTrocarFolhaModal },
+    { label: 'Recalcular Dados', action: openRecalcularModal },
   ];
 
   return (
@@ -237,6 +256,10 @@ const Dashboard = () => {
           onClose={closeModal}
           onSubmit={handleRegistroPonto}
         />
+      )}
+
+      {isRecalcularModalOpen && (
+        <RecalcularDadosModal onClose={closeRecalcularModal} />
       )}
 
       {isGerenciarModalOpen && (

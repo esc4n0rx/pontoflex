@@ -6,6 +6,11 @@
         "feriado": "Ano Novo"
       },
       {
+        "dia": 20,
+        "mes": "Janeiro",
+        "feriado": "São Sebastião"
+      },
+      {
         "dia": 3,
         "mes": "Março",
         "feriado": "Segunda de Carnaval"
