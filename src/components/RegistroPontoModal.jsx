@@ -9,36 +9,39 @@ const RegistroPontoModal = ({ onClose, onSubmit }) => {
   const [horaEntrada, setHoraEntrada] = useState('');
   const [horaSaida, setHoraSaida] = useState('');
   const [flagNoturno, setFlagNoturno] = useState(false);
+  const [isFeriado, setIsFeriado] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     if (!dia || !horaEntrada || !horaSaida) {
       alert('Todos os campos devem ser preenchidos.');
       return;
     }
-
+  
     // Se não for noturno (flagNoturno === false) e a hora de entrada é >= hora de saída,
     // significa que não cruzou a meia-noite e a entrada deve ser menor que a saída.
     if (flagNoturno === false && horaEntrada >= horaSaida) {
       alert('A hora de entrada deve ser menor que a hora de saída.');
       return;
     }
-
+  
     const totalHoras = calcularTotalHoras(horaEntrada, horaSaida);
-    const feriado = await isHoliday(new Date(dia));
     const escala = user.escala;
     const diaSemana = new Date(dia).toLocaleString('pt-BR', { weekday: 'long' }).toLowerCase();
+  
+    // Substituir 'feriado' por 'isFeriado'
     const { horasExtras, horasPositivas, horasNegativas } = 
-      calcularHorasExtras(totalHoras, escala, diaSemana, feriado);
-
+      calcularHorasExtras(totalHoras, escala, diaSemana, isFeriado);
+  
     const adicionalNoturno = calcularAdicionalNoturno(horaEntrada, horaSaida, flagNoturno);
-
+  
     onSubmit({
       dia,
       horaEntrada,
       horaSaida,
       flagNoturno,
+      isFeriado, // Envia a flag marcada no modal
       total_horas: totalHoras,
       horas_extras: horasExtras,
       horas_positivas: horasPositivas,
@@ -47,6 +50,7 @@ const RegistroPontoModal = ({ onClose, onSubmit }) => {
     });
   };
 
+  
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
       <div className="bg-gray-800 text-white p-6 rounded-lg shadow-lg w-full max-w-md">
@@ -84,6 +88,15 @@ const RegistroPontoModal = ({ onClose, onSubmit }) => {
               className="mr-2"
             />
             <label>Trabalho Noturno</label>
+          </div>
+          <div className="flex items-center mb-4">
+            <input
+              type="checkbox"
+              checked={isFeriado}
+              onChange={(e) => setIsFeriado(e.target.checked)} 
+              className="mr-2"
+            />
+            <label>É Feriado?</label>
           </div>
           <button type="submit" className="bg-green-500 hover:bg-green-600 px-4 py-2 rounded">
             Registrar

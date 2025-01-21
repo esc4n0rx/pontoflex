@@ -136,15 +136,14 @@ const Dashboard = () => {
   const handleRegistroPonto = async (registro) => {
     try {
       const totalHoras = calcularTotalHoras(registro.horaEntrada, registro.horaSaida);
-      const feriado = await isHoliday(new Date(registro.dia));
+  
+      // Prioriza o feriado manualmente marcado pelo usuário
+      const feriado = registro.isFeriado ?? await isHoliday(new Date(registro.dia));
+  
       const escala = user.escala;
       const [year, month, day] = registro.dia.split('-').map(Number);
       const date = new Date(Date.UTC(year, month - 1, day)); // Cria a data em UTC
       const diaSemana = date.toLocaleString('pt-BR', { weekday: 'long', timeZone: 'UTC' }).toLowerCase();
-
-  
-      // Log do dia da semana em texto
-      console.log(`Registrando ponto no dia: ${diaSemana.charAt(0).toUpperCase() + diaSemana.slice(1)}`);
   
       const { horasExtras, horasPositivas, horasNegativas } = calcularHorasExtras(
         registro.horaEntrada,
@@ -153,10 +152,9 @@ const Dashboard = () => {
         diaSemana,
         feriado
       );
-      console.log('Horas extras:', horasExtras);
   
       const adicionalNoturno = calcularAdicionalNoturno(registro.horaEntrada, registro.horaSaida, registro.flagNoturno);
-      
+  
       const dadosRegistro = {
         usuario_id: user.id,
         dia: registro.dia,
@@ -167,7 +165,7 @@ const Dashboard = () => {
         horas_positivas: horasPositivas,
         horas_negativas: horasNegativas,
         adicional_noturno: adicionalNoturno,
-        is_feriado: feriado,
+        is_feriado: feriado, // Inclui feriado manual ou automático
         escala_usuario: escala,
       };
   
@@ -184,6 +182,7 @@ const Dashboard = () => {
       toast.error('Erro ao registrar ponto.');
     }
   };
+  
   
   
   const handleAlterarRegistro = async (alteracoes) => {

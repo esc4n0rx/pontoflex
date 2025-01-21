@@ -1,6 +1,5 @@
 import feriados2025 from '../src/holiday.json';
 
-// Mapeia meses por escrito para número
 const monthsMap = {
   'Janeiro': 1,
   'Fevereiro': 2,
@@ -16,8 +15,9 @@ const monthsMap = {
   'Dezembro': 12
 };
 
-// Verifica se uma data é feriado
-export const isHoliday = async (date) => {
+export const isHoliday = (dateString) => {
+  const date = new Date(dateString);
+  console.log(date); 
   if (date.getFullYear() !== 2025) {
     return false;
   }
@@ -30,6 +30,7 @@ export const isHoliday = async (date) => {
     return fer.dia === dia && mesNumerico === mes;
   });
 };
+
 
 // Corrige a data para ser salva corretamente no banco
 export const corrigirDataRegistro = (data) => {
